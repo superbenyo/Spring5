@@ -17,14 +17,14 @@ public class MvcConfig  extends WebMvcConfigurerAdapter{
     private final Logger log = LoggerFactory.getLogger(getClass());
 //TODO Esto que se comento es para cargar la imagen desde la carpeta upload y asi poder visualizar la imagen
 //TODO    dentro del aplicativo
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        super.addResourceHandlers(registry);
-        String resourcePath = Paths.get("upload").toAbsolutePath().toUri().toString();
-        log.info("RESOURCE_PATH: ---> " + resourcePath);
-        registry.addResourceHandler("/upload/**")
-//        registry.addResourceHandler(resourcePath)
-//                .addResourceLocations("file:/home/administrador/IdeaProjects/Cursos/Spring-5/upload/");
-                .addResourceLocations(resourcePath);
-    }
+//    @Override
+//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//        super.addResourceHandlers(registry);
+//        String resourcePath = Paths.get("upload").toAbsolutePath().toUri().toString();
+//        log.info("RESOURCE_PATH: ---> " + resourcePath);
+//        registry.addResourceHandler("/upload/**")
+////        registry.addResourceHandler(resourcePath)
+////                .addResourceLocations("file:/home/administrador/IdeaProjects/Cursos/Spring-5/upload/");
+//                .addResourceLocations(resourcePath);
+//    }
 }
