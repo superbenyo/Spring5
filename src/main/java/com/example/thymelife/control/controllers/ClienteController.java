@@ -4,6 +4,8 @@ import com.example.thymelife.control.service.ClienteService;
 import com.example.thymelife.model.dto.ClienteDto;
 import com.example.thymelife.model.entity.Cliente;
 import com.example.thymelife.util.PageRender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,11 +19,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by administrador on 10/11/17.
@@ -33,6 +37,10 @@ public class ClienteController {
 
     @Autowired
     private ClienteService clienteService;
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
+//    @GetMapping(value = "/upload/{filename:.+}")
 
     @GetMapping(value = "/ver/{id}")
     public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash){
@@ -80,16 +88,15 @@ public class ClienteController {
         }
 
         if (!foto.isEmpty()){
-//            Path directorioRecursos = Paths.get("/home/administrador/IdeaProjects/Cursos/Spring-5/upload");
-//            Path directorioRecursos = Paths.get("src//main//resources//static/upload");
-//            String rootPath = directorioRecursos.toFile().getAbsolutePath();
-            String rootPath = "/home/administrador/IdeaProjects/Cursos/Spring-5/upload";
+            String uniqueFlieName = UUID.randomUUID().toString() + "_"+foto.getOriginalFilename();
+            Path rootPath = Paths.get("upload").resolve(uniqueFlieName);
+            Path rootAbsolutePath = rootPath.toAbsolutePath();
+            log.info("RootPath: " + rootPath);
+            log.info("RootAbsolutePath: " + rootAbsolutePath);
             try {
-                byte[] bytes = foto.getBytes();
-                Path rutaCompleta  = Paths.get(rootPath + "//" + foto.getOriginalFilename());
-                Files.write(rutaCompleta, bytes);
-                flash.addFlashAttribute("info", "Has subido correctamente '" + foto.getOriginalFilename() + "'");
-                cliente.setFoto(foto.getOriginalFilename());
+                Files.copy(foto.getInputStream(), rootAbsolutePath);
+                flash.addFlashAttribute("info", "Has subido correctamente '" + uniqueFlieName + "'");
+                cliente.setFoto(uniqueFlieName);
             } catch (IOException e) {
                 e.printStackTrace();
             }
