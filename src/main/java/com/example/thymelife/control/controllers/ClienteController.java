@@ -1,14 +1,11 @@
 package com.example.thymelife.control.controllers;
 
 import com.example.thymelife.control.service.ClienteService;
-import com.example.thymelife.model.dto.ClienteDto;
+import com.example.thymelife.control.service.UploadFileService;
 import com.example.thymelife.model.entity.Cliente;
 import com.example.thymelife.util.PageRender;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,14 +19,9 @@ import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created by administrador on 10/11/17.
@@ -41,28 +33,24 @@ public class ClienteController {
 
     @Autowired
     private ClienteService clienteService;
+    @Autowired
+    private UploadFileService uploadFileService;
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
 
-    public static final String UPLOAD_FOLDER = "upload";
 
-//    @GetMapping(value = "/upload/{filename:.+}")
-//    public ResponseEntity<Resource> verFoto(@PathVariable String filename){
-//        Path pathFoto = Paths.get("upload").resolve(filename).toAbsolutePath();
-//        log.info("pathPfot" + pathFoto);
-//        Resource resource = null;
-//        try {
-//             resource = new UrlResource(pathFoto.toUri());
-//            if (!resource.exists()  || !resource.isReadable()){
-//                throw new RuntimeException("Error: nos se puede cargar la imagen: " + pathFoto.toString());
-//            }
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        }
-//        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +
-//                resource.getFilename() + "\"").body(resource);
-//
-//    }
+    @GetMapping(value = "/upload/{filename:.+}")
+    public ResponseEntity<Resource> verFoto(@PathVariable String filename){
+
+        Resource resource = null;
+        try {
+            resource = uploadFileService.load(filename);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" +
+                resource.getFilename() + "\"").body(resource);
+
+    }
 
     @GetMapping(value = "/ver/{id}")
     public String ver(@PathVariable(value = "id") Long id, Map<String, Object> model, RedirectAttributes flash){
@@ -111,25 +99,19 @@ public class ClienteController {
 
         if (!foto.isEmpty()){
             if (cliente.getId() != null && cliente.getId() > 0 && cliente.getFoto().length() >0){
-                Path rootPath = Paths.get(UPLOAD_FOLDER).resolve(cliente.getFoto()).toAbsolutePath();
-                File file = rootPath.toFile();
-
-                if (file.exists() && file.canRead()){
-                    file.delete();
-                }
+                uploadFileService.delete(cliente.getFoto());
             }
-            String uniqueFlieName = UUID.randomUUID().toString() + "_"+foto.getOriginalFilename();
-            Path rootPath = Paths.get(UPLOAD_FOLDER).resolve(uniqueFlieName);
-            Path rootAbsolutePath = rootPath.toAbsolutePath();
-            log.info("RootPath: " + rootPath);
-            log.info("RootAbsolutePath: " + rootAbsolutePath);
+
+            String uniqueFlieName = null;
             try {
-                Files.copy(foto.getInputStream(), rootAbsolutePath);
-                flash.addFlashAttribute("info", "Has subido correctamente '" + uniqueFlieName + "'");
-                cliente.setFoto(uniqueFlieName);
+                uniqueFlieName = uploadFileService.copy(foto);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            flash.addFlashAttribute("info", "Has subido correctamente '" + uniqueFlieName + "'");
+            cliente.setFoto(uniqueFlieName);
+
         }
 
         String mensajeFlash = (cliente.getId() != null) ? "Cliente Editado con Exito!!" : "Cliente Creado Con Exito";
@@ -168,14 +150,9 @@ public class ClienteController {
             Cliente cliente = clienteService.findOne(id);
             clienteService.delete(id);
             flash.addFlashAttribute("success", "Cliente Eliminado con Exito!");
-            Path rootPath = Paths.get(UPLOAD_FOLDER).resolve(cliente.getFoto()).toAbsolutePath();
-            File file = rootPath.toFile();
 
-            if (file.exists() && file.canRead()){
-                if(file.delete()){
-                    flash.addFlashAttribute("info", "Foto " + cliente.getFoto() + " se ha eliminado");
-                }
-
+            if(uploadFileService.delete(cliente.getFoto())){
+                flash.addFlashAttribute("info", "Foto " + cliente.getFoto() + " se ha eliminado");
             }
         }
         return "redirect:/listar";
