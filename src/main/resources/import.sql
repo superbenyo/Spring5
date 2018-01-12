@@ -1,4 +1,4 @@
-insert into clientes(nombre, apellido, email, creado_en, foto) values('patitas', 'flores', 'patas@gmail.com', '2017-08-20', 'lala.jpeg');
+insert into clientes(nombre, apellido, email, creado_en, foto) values('patitas', 'flores', 'patas@gmail.com', '2017-08-20', '6a111703-69c9-4d0a-8e50-dcf20a69213c_soap.png');
 insert into clientes(nombre, apellido, email, creado_en, foto) values('gina', 'flores', 'gina@gmail.com', '2017-01-01', '');
 insert into clientes(nombre, apellido, email, creado_en, foto) values('patitas', 'flores', 'patas@gmail.com', '2017-08-20', '');
 insert into clientes(nombre, apellido, email, creado_en, foto) values('gina', 'flores', 'gina@gmail.com', '2017-01-01', '');
