@@ -7,7 +7,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by administrador on 10/11/17.
@@ -43,7 +45,14 @@ public class Cliente implements Serializable{
     @Column(name = "foto")
     private String foto;
 
-//    @PrePersist
+    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Factura> facturas;
+
+    public Cliente() {
+        facturas = new ArrayList<>();
+    }
+
+    //    @PrePersist
 //    public void prePersist(){
 //        creadoEn = new Date();
 //    }
@@ -94,5 +103,17 @@ public class Cliente implements Serializable{
 
     public void setFoto(String foto) {
         this.foto = foto;
+    }
+
+    public List<Factura> getFacturas() {
+        return facturas;
+    }
+
+    public void setFacturas(List<Factura> facturas) {
+        this.facturas = facturas;
+    }
+
+    public void addFactura(Factura factura){
+        facturas.add(factura);
     }
 }
