@@ -17,10 +17,11 @@ public class ItemFactura implements Serializable{
     private Long id;
     private Integer cantidad;
 
-    private Producto producto;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "producto_id")
+    private Producto producto;
+
+
     public Long getId() {
         return id;
     }

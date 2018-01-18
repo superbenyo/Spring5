@@ -17,7 +17,6 @@ public class Factura implements Serializable{
     private static final long serialVersionUID = 1L;
 
     @Id
-    @NotNull
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -25,24 +24,24 @@ public class Factura implements Serializable{
 
     private String observacion;
 
-    @Column(name = "creado_en")
     @Temporal(TemporalType.DATE)
+    @Column(name = "creado_en")
     private Date creadoEn;
-
-    @PrePersist
-    public void prePersistente(){
-        creadoEn = new Date();
-    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Cliente cliente;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "factura_id")
     private List<ItemFactura> items;
 
     public Factura() {
         this.items = new ArrayList<ItemFactura>();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        creadoEn = new Date();
     }
 
     public Long getId() {
@@ -74,7 +73,7 @@ public class Factura implements Serializable{
     }
 
     public void setCreadoEn(Date creadoEn) {
-        creadoEn = creadoEn;
+        this.creadoEn = creadoEn;
     }
 
     public Cliente getCliente() {
@@ -93,16 +92,17 @@ public class Factura implements Serializable{
         this.items = items;
     }
 
-    public void addItemFactura(ItemFactura item){
+    public void addItemFactura(ItemFactura item) {
         this.items.add(item);
     }
 
-    public Double getTotal(){
+    public Double getTotal() {
         Double total = 0.0;
         int size = items.size();
-        for (int i = 0 ; i < size ; i++){
+        for (int i = 0; i < size; i++) {
             total += items.get(i).calcularImporte();
         }
         return total;
     }
+
 }
