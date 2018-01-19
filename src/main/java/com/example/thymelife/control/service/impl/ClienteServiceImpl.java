@@ -3,8 +3,10 @@ package com.example.thymelife.control.service.impl;
 import com.example.thymelife.control.component.ClienteConverter;
 import com.example.thymelife.control.service.ClienteService;
 import com.example.thymelife.model.dao.ClienteDao;
+import com.example.thymelife.model.dao.ProductoDao;
 import com.example.thymelife.model.dto.ClienteDto;
 import com.example.thymelife.model.entity.Cliente;
+import com.example.thymelife.model.entity.Producto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,9 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Autowired
     private ClienteDao clienteDao;
+
+    @Autowired
+    private ProductoDao productoDao;
 
     @Autowired
     @Qualifier("clienteConverter")
@@ -55,5 +60,10 @@ public class ClienteServiceImpl implements ClienteService {
     @Transactional
     public void delete(Long id) {
         clienteDao.delete(id);
+    }
+
+    @Override
+    public List<Producto> findByName(String term) {
+        return productoDao.findByNombreLikeIgnoreCase("%"+term+"%");
     }
 }

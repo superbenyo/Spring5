@@ -2,6 +2,7 @@ package com.example.thymelife.control.service;
 
 import com.example.thymelife.model.dto.ClienteDto;
 import com.example.thymelife.model.entity.Cliente;
+import com.example.thymelife.model.entity.Producto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,4 +17,5 @@ public interface ClienteService {
     public void save(Cliente cliente);
     public Cliente findOne(Long id);
     public void delete(Long id);
+    List<Producto> findByName(String term);
 }
