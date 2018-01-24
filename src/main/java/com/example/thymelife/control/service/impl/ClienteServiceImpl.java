@@ -3,9 +3,11 @@ package com.example.thymelife.control.service.impl;
 import com.example.thymelife.control.component.ClienteConverter;
 import com.example.thymelife.control.service.ClienteService;
 import com.example.thymelife.model.dao.ClienteDao;
+import com.example.thymelife.model.dao.FacturaDao;
 import com.example.thymelife.model.dao.ProductoDao;
 import com.example.thymelife.model.dto.ClienteDto;
 import com.example.thymelife.model.entity.Cliente;
+import com.example.thymelife.model.entity.Factura;
 import com.example.thymelife.model.entity.Producto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,6 +34,9 @@ public class ClienteServiceImpl implements ClienteService {
     @Autowired
     @Qualifier("clienteConverter")
     private ClienteConverter clienteConverter;
+
+    @Autowired
+    private FacturaDao facturaDao;
 
     @Override
     @Transactional(readOnly = true)
@@ -65,5 +70,17 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     public List<Producto> findByName(String term) {
         return productoDao.findByNombreLikeIgnoreCase("%"+term+"%");
+    }
+
+    @Override
+    @Transactional
+    public void saveFactura(Factura factura) {
+        facturaDao.save(factura);
+    }
+
+    @Override
+    @Transactional
+    public Producto findProductoById(Long id) {
+        return productoDao.findOne(id);
     }
 }
