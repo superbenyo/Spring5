@@ -44,7 +44,10 @@ public class FacturaController {
 
     @GetMapping("/ver/{id}")
     public String ver(@PathVariable(value = "id") long id, Model model, RedirectAttributes flash){
-        Factura factura = clienteService.findFacturaById(id);
+        // Metodo para hacer el servicio con jpa y hibernate
+//        Factura factura = clienteService.findFacturaById(id);
+        // metodo consulta completa
+        Factura factura = clienteService.fethcByIdWithClienteWithItemFacturaWithProducto(id);
 
         if (factura == null){
             flash.addFlashAttribute("error", "La factyura no existe en la base de datos");

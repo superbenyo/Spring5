@@ -23,5 +23,6 @@ public interface ClienteService {
     Producto findProductoById(Long id);
     Factura findFacturaById(Long id);
     void deleteFactura(Long id);
+    Factura fethcByIdWithClienteWithItemFacturaWithProducto(Long id);
 
 }
